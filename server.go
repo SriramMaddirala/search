@@ -26,6 +26,10 @@ type PostRow struct {
 	EventId      string
 	PostDate     string
 }
+type UserRow struct {
+	Username string
+	PosterId string
+}
 
 func search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -63,8 +67,31 @@ func search(w http.ResponseWriter, r *http.Request) {
 	if error != nil {
 		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 	}
+	rows, err = db.Query(`SELECT * FROM users WHERE username LIKE '%' || $1 || '%'`, word)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		panic(err)
+	}
+	var userData []UserRow
+	for rows.Next() {
+		var (
+			PosterId string
+			JoinDate string
+			Username string
+			Password string
+			Email    string
+		)
+		if err := rows.Scan(&PosterId, &JoinDate, &Username, &Password, &Email); err != nil {
+			log.Fatal(err)
+		}
+		userData = append(userData, UserRow{PosterId: PosterId, Username: Username})
+	}
+	resultUsers, error := json.Marshal(userData)
+	if error != nil {
+		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+	}
+	result = append(result, resultUsers...)
 	w.Write(result)
-	fmt.Print(word)
 }
 func auto(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -92,12 +119,71 @@ func handleRequests() {
 	http.ListenAndServe(":1026", nil)
 }
 func main() {
-	handleRequests()
+	addQuery("1up", trie)
+	addQuery("1upagain", trie)
+	addQuery("b@sman", trie)
+	addQuery("battery", trie)
+	addQuery("batting", trie)
+	addQuery("batmobile", trie)
+	addQuery("bats", trie)
+	addQuery("batch", trie)
+	addQuery("battle", trie)
+	addQuery("baton", trie)
+	addQuery("bathtub", trie)
+	addQuery("batik", trie)
+	addQuery("batter", trie)
+	addQuery("batwoman", trie)
+	addQuery("batty", trie)
+	addQuery("bathe", trie)
+	addQuery("baton", trie)
+	addQuery("batsman", trie)
+	addQuery("battalion", trie)
+	addQuery("batfish", trie)
+	addQuery("batmobile", trie)
+	addQuery("batik", trie)
+	addQuery("batter", trie)
+	addQuery("batwoman", trie)
+	addQuery("batty", trie)
+	addQuery("bathe", trie)
+	addQuery("baton", trie)
+	addQuery("batsman", trie)
+	addQuery("battalion", trie)
+	addQuery("batfish", trie)
+	addQuery("batmobile", trie)
+	addQuery("batik", trie)
+	addQuery("batter", trie)
+	addQuery("batwoman", trie)
+	addQuery("batty", trie)
+	addQuery("bathe", trie)
+	addQuery("baton", trie)
+	addQuery("batsman", trie)
+	addQuery("battalion", trie)
+	addQuery("batfish", trie)
+	addQuery("batmobile", trie)
+	addQuery("batik", trie)
+	addQuery("batter", trie)
+	addQuery("batwoman", trie)
+	addQuery("batty", trie)
+	addQuery("bathe", trie)
+	addQuery("baton", trie)
+	addQuery("batsman", trie)
+	addQuery("battalion", trie)
+	addQuery("batfish", trie)
+	addQuery("bat", trie)
+	addQuery("battery", trie)
+	addQuery("batman", trie)
+	addQuery("batting", trie)
+	addQuery("batter", trie)
+	addQuery("batmobile", trie)
+	addQuery("1", trie)
+	startsWith("1", trie)
+	getTop("1", trie)
+	//handleRequests()
 }
 func init() {
 	trie = &TrieNode{
 		count:   0,
-		nodes:   make([]*TrieNode, 26),
+		nodes:   make(map[rune]*TrieNode),
 		wordEnd: false,
 	}
 	godotenv.Load()
