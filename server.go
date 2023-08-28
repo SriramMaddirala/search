@@ -176,9 +176,7 @@ func main() {
 	addQuery("batter", trie)
 	addQuery("batmobile", trie)
 	addQuery("1", trie)
-	startsWith("1", trie)
-	getTop("1", trie)
-	//handleRequests()
+	handleRequests()
 }
 func init() {
 	trie = &TrieNode{
