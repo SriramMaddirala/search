@@ -30,6 +30,10 @@ type UserRow struct {
 	Username string
 	PosterId string
 }
+type ResultRows struct {
+	PostRows []PostRow
+	UserRows []UserRow
+}
 
 func search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -63,10 +67,6 @@ func search(w http.ResponseWriter, r *http.Request) {
 		}
 		rowsData = append(rowsData, PostRow{PostId: PostId, PosterId: PosterId, PostDate: PostDate, CommId: CommId, ParentPostId: ParentPostId, TextContent: TextContent, MediaLinks: MediaLinks, EventId: EventId})
 	}
-	result, error := json.Marshal(rowsData)
-	if error != nil {
-		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-	}
 	rows, err = db.Query(`SELECT * FROM users WHERE username LIKE '%' || $1 || '%'`, word)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -86,11 +86,11 @@ func search(w http.ResponseWriter, r *http.Request) {
 		}
 		userData = append(userData, UserRow{PosterId: PosterId, Username: Username})
 	}
-	resultUsers, error := json.Marshal(userData)
+	structResult := ResultRows{PostRows: rowsData, UserRows: userData}
+	result, error := json.Marshal(structResult)
 	if error != nil {
 		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 	}
-	result = append(result, resultUsers...)
 	w.Write(result)
 }
 func auto(w http.ResponseWriter, r *http.Request) {
