@@ -27,8 +27,9 @@ type PostRow struct {
 	PostDate     string
 }
 type UserRow struct {
-	Username string
-	PosterId string
+	Username   string
+	PosterId   string
+	MediaLinks string
 }
 type ResultRows struct {
 	PostRows []PostRow
@@ -75,16 +76,17 @@ func search(w http.ResponseWriter, r *http.Request) {
 	var userData []UserRow
 	for rows.Next() {
 		var (
-			PosterId string
-			JoinDate string
-			Username string
-			Password string
-			Email    string
+			PosterId   string
+			JoinDate   string
+			Username   string
+			Password   string
+			Email      string
+			MediaLinks string
 		)
-		if err := rows.Scan(&PosterId, &JoinDate, &Username, &Password, &Email); err != nil {
+		if err := rows.Scan(&PosterId, &JoinDate, &Username, &Password, &Email, &MediaLinks); err != nil {
 			log.Fatal(err)
 		}
-		userData = append(userData, UserRow{PosterId: PosterId, Username: Username})
+		userData = append(userData, UserRow{PosterId: PosterId, Username: Username, MediaLinks: MediaLinks})
 	}
 	structResult := ResultRows{PostRows: rowsData, UserRows: userData}
 	result, error := json.Marshal(structResult)
