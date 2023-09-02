@@ -31,5 +31,3 @@ func (pq *trieHeap) Pop() any {
 	*pq = old[0 : n-1]
 	return trieData
 }
-
-// need to add a top to allow pruning of certain branches that will never surpass count
